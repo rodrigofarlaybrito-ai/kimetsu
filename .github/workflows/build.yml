@@ -10,6 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Extrair o projeto do zip
+        run: |
+          ZIP="$(ls *.zip | head -n1)"
+          echo "Usando $ZIP"
+          mkdir proj
+          unzip -q "$ZIP" -d proj
+          ls proj/kimetsumod
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -20,10 +28,11 @@ jobs:
           gradle-version: 8.1.1
 
       - name: Build
+        working-directory: proj/kimetsumod
         run: gradle build --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
           name: kimetsumod-jar
-          path: build/libs/*.jar
-          
+          path: proj/kimetsumod/build/libs/*.jar
+          if-no-files-found: error
